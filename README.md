@@ -1,44 +1,47 @@
 # Car Matchmaker
 
-**CarDekho Group — Take-Home Assignment (Software Engineer, AI-Native)**
+**CarDekho Group — Take-Home Assignment (Software Engineer)**
 
-A full-stack web app that helps confused car buyers go from *“I don’t know what to buy”* to *“I’m confident about my shortlist”* — by answering two questions (budget + top priority) and surfacing a ranked **top 3** with clear reasons on each card.
+A full-stack web app that helps car buyers narrow a large catalog down to a **top 3 shortlist** — by entering a budget and whether safety or fuel efficiency matters more.
+
+**Live app:** [https://car-matchmaker-production.up.railway.app/](https://car-matchmaker-production.up.railway.app/)
 
 **Repository:** [https://github.com/Harshita9v9/car-matchmaker](https://github.com/Harshita9v9/car-matchmaker)
 
-| Deliverable | Status |
-|-------------|--------|
-| GitHub repo | Above link |
-| Run instructions | See **Quick start** below (`docker compose up` — under 2 minutes, no Java required) |
-| Live URL | *[Add if deployed to Railway / Render / etc.]* |
-| Screen recording | *[Add Loom / Drive / YouTube (unlisted) link — mandatory per brief]* |
+| Deliverable | Link |
+|-------------|------|
+| Live URL | [car-matchmaker-production.up.railway.app](https://car-matchmaker-production.up.railway.app/) |
+| GitHub repo | [Harshita9v9/car-matchmaker](https://github.com/Harshita9v9/car-matchmaker) |
+| Run locally | `docker compose up --build` (see below) |
+| Screen recording | [https://youtu.be/4mn6sJqibM4](https://youtu.be/4mn6sJqibM4) |
 
 ---
 
-## Quick start (single-command local setup)
+## Screenshots
 
-Per the assignment: reviewers must be able to run the app in **under 2 minutes** without installing Java.
+### Home page
 
-**Prerequisites:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running.
+![Home page](docs/home.png)
 
-From the project root:
+### Recommendations
+
+![Results page](docs/results.png)
+
+---
+
+## Quick start (Docker)
+
+**Prerequisites:** [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
 ```bash
 docker compose up --build
 ```
 
-Open **http://localhost:8080** in your browser.
-
-To run in the background:
+Open **http://localhost:8080**
 
 ```bash
-docker compose up --build -d
-```
-
-To stop:
-
-```bash
-docker compose down
+docker compose up --build -d   # background
+docker compose down            # stop
 ```
 
 ---
@@ -47,111 +50,90 @@ docker compose down
 
 Requires **JDK 17+**.
 
-**Windows:**
-
 ```cmd
 run.cmd
 ```
 
-**Any OS:**
+or
 
 ```bash
-./mvnw spring-boot:run
+mvnw spring-boot:run
 ```
 
-Then visit **http://localhost:8080**.
+---
+
+## Architecture
+
+```
+Browser
+   │
+Thymeleaf UI  (index.html, results.html)
+   │
+Spring MVC Controller  (CarController)
+   │
+Recommendation Service  (CarService — filter, sort, top 3)
+   │
+In-Memory Dataset  (15 cars loaded at startup)
+```
+
+**Request flow:** User submits budget + priority → controller calls `getRecommendations()` → service filters by price, sorts by safety or mileage, returns three cars → Thymeleaf renders result cards.
 
 ---
 
 ## How it works
 
-1. Enter **maximum budget (₹)** and what matters most: **Safety First** or **Fuel Efficiency**.
-2. Backend filters cars within budget, sorts by your priority (`safetyRating` or `mileage` descending), returns **top 3**.
-3. Results page shows make/model, price, mileage, safety (out of 5), category, and a highlighted review — so the buyer understands *why* each pick fits.
+1. Enter **maximum budget (₹)** and priority: **Safety First** or **Fuel Efficiency**.
+2. Backend keeps cars within budget, sorts by `safetyRating` or `mileage` (descending), returns **top 3**.
+3. Results show make/model, price, mileage, safety (out of 5), category, and a review snippet.
 
-Dataset: 15 Indian-market cars (hardcoded at startup from the provided JSON spec).
+Dataset: 15 Indian-market cars loaded in memory at startup.
 
 ---
 
 ## Assignment README (required answers)
 
-*These sections directly answer the four required questions from the **CarDekho Group — Software Engineer (AI-Native) take-home brief**.*
-
 ### 1. What did you build and why? What did you deliberately cut?
 
-**Built:** A **Car Matchmaker** wizard — a tight, opinionated MVP aligned with the brief: too many options, no easy way to choose. The app **reduces cognitive load** by asking only for **budget** and **one priority**, then returning a **confident shortlist of three** cars with spec summaries and review blurbs. The goal is progress in one session: confused → shortlist, not a full research portal.
+**Built:** A **Car Matchmaker** wizard for the assignment brief — buyers face too many options and need a fast way to shortlist. The app **keeps the decision simple** by asking only for **budget** and **one priority**, then shows **three cars** with specs and short reviews. One session: many choices → three names worth researching further.
 
 **Deliberately cut:**
 
-- **Real database (MySQL / PostgreSQL)** — inventory lives in memory (`@PostConstruct`) so reviewers get zero DB setup and the backend still does non-trivial **filter + sort + rank** work.
-- **User authentication** — anonymous, one-shot flow; no accounts or saved sessions.
-- **Variant-level catalog, compare tables, admin CMS, tests suite** — out of scope for a **2–3 hour** build window; would dilute the core “shortlist in seconds” story.
+- **Database (MySQL / PostgreSQL)** — I intentionally avoided introducing a database because the assignment was **time-boxed** and the recommendation logic did **not require persistence**. Keeping the dataset **in memory** reduced setup complexity while still allowing the backend to perform meaningful **filtering, ranking, and recommendation** logic (`@PostConstruct` load of 15 cars).
+- **User authentication** — no sign-up; anonymous one-shot flow.
+- **Variant-level catalog, compare UI, admin panel, full test suite** — out of scope for a 2–3 hour build; would spread effort away from the core flow.
 
-I’d rather ship a **tight, opinionated MVP** that actually helps a confused buyer than a half-finished kitchen sink (per the brief’s evaluation criteria).
+I focused on a small feature set that works end-to-end rather than a larger app that would stay half-finished.
 
 ### 2. What's your tech stack and why did you pick it?
 
 | Layer | Choice |
 |--------|--------|
-| Language | **Java 17** |
-| Framework | **Spring Boot 3** (Web + Thymeleaf) |
-| UI | **Thymeleaf** + **Tailwind CSS** (CDN) |
-| Build | **Maven** (`mvnw`) |
-| Deploy / local | **Docker** (Eclipse Temurin 17) + **Docker Compose** |
+| Language | Java 17 |
+| Framework | Spring Boot 3 (Web + Thymeleaf) |
+| UI | Thymeleaf + Tailwind CSS (CDN) |
+| Build | Maven (`mvnw`) |
+| Deploy | Docker + [Railway](https://railway.app) |
 
-**Why:** **Java + Spring Boot** for fast, readable backend logic (MVC, dependency injection, recommendation service). **Thymeleaf** keeps frontend and backend in one repo — **no separate SPA or REST contract** for a simple form → results flow, so **zero frontend connection overhead**. **Tailwind via CDN** gives a responsive, modern UI without a Node build step. **Docker Compose** meets the hard constraint: **single-command** runnable app for anyone reviewing the repo.
-
-The brief does not mandate a specific framework; this stack optimizes **shipping speed** and **end-to-end “it works.”**
+**Why:** Java and Spring Boot are a good fit for server-side filtering and sorting with clear structure (controller / service / model). **Thymeleaf** keeps the UI in the same project as the backend — no separate frontend app or REST layer for a simple form → results page. **Tailwind via CDN** adds layout and styling without a Node build step. **Docker Compose** gives reviewers a one-command local run; **Railway** hosts the live demo from the same `Dockerfile`.
 
 ### 3. What did you delegate to AI tools vs. do manually? Where did they help most / get in the way?
 
-*Complete the checkboxes and notes from your screen recording session.*
+I used **Cursor** to generate the initial Spring Boot project structure (`Car`, `CarService`, `CarController`), Thymeleaf templates with Tailwind styling, Docker/`compose.yaml` setup, and a first draft of this README.
 
-**Delegated to AI (Cursor):**
+I **manually** reviewed the generated code, adjusted the recommendation logic, verified sorting behavior (safety vs. mileage), fixed environment issues (Java path, Git credentials, Railway `PORT` binding), deployed to Railway, and tested the application end-to-end in the browser.
 
-- [ ] Spring Boot structure: `Car` model, `CarService` (`getRecommendations`), `CarController`
-- [ ] Hardcoding 15-car JSON dataset in `@PostConstruct`
-- [ ] Thymeleaf pages (`index.html`, `results.html`) with Tailwind styling
-- [ ] `Dockerfile`, `compose.yaml`, `.dockerignore`
-- [ ] Initial `README.md` draft aligned to assignment questions
+**Where AI helped most:** Speed on boilerplate — MVC wiring, HTML templates, multi-stage Dockerfile, and README structure — so more time stayed on behavior and deployment.
 
-**Done manually:**
+**Where AI got in the way:** Occasional over-wordy README phrasing (edited down), and Git push failed until the correct GitHub account was used — that part had to be fixed outside the tool.
 
-- [ ] Scoping: wizard vs. full catalog; two priorities only; top 3 only
-- [ ] Browser testing: budget filter, safety vs. mileage sort order
-- [ ] Git setup, commit, push to GitHub
-- [ ] *[Anything you edited or rejected from AI output]*
-
-**Where AI helped most:**
-
-- [ ] *e.g. Boilerplate velocity, Docker multi-stage pattern, consistent UI layout*
-
-**Where AI got in the way:**
-
-- [ ] *e.g. Git push auth, environment-specific fixes, over-scoped suggestions*
-
-**Process note (brief):** Screen recording should show prompting, review/course-correction, and when you stopped using the tool and typed code yourself — that transparency is what CarDekho evaluates under **agentic tool usage (30%)**.
+The screen recording shows prompting, reviewing output, and correcting issues rather than accepting everything as-is.
 
 ### 4. If you had another 4 hours, what would you add?
 
-1. **LLM integration** — personalized “why this car for *you*” summaries based on budget + priority (beyond static review strings).
-2. **Cloud database** — move from in-memory JSON to **PostgreSQL** (or similar) with real inventory and optional admin updates.
-3. **Deploy live** (Railway / Render / Fly.io) so reviewers have a URL, not only Docker.
-4. *(Stretch)* Lightweight integration tests for `getRecommendations` and a health check in Compose.
-
----
-
-## How this maps to the assignment constraints
-
-| Constraint | How this repo meets it |
-|------------|-------------------------|
-| Working web app | Spring Boot app + Thymeleaf UI |
-| Run in under 2 min | `docker compose up --build` → http://localhost:8080 |
-| Full-stack | Interactive frontend + backend filter/sort/rank logic |
-| Screen recording | *[Your link]* — terminal, editor, browser; unedited or lightly fast-forwarded |
-| Time-box (2–3 h build) | Scoped MVP; see cuts above |
-
-**Evaluation alignment (from brief):** Product decisions (tight shortlist wizard), agentic usage (recording + honest AI section above), sensible layered code (`model` / `service` / `controller`), execution speed (Docker one-liner, working E2E flow).
+1. **LLM integration** — short, personalized “why this car fits you” text from budget + priority, not only static reviews.
+2. **Cloud database** — PostgreSQL (or similar) for real inventory and updates without redeploying.
+3. **Integration tests** for `getRecommendations` (budget filter, sort order, limit of 3).
+4. **Health endpoint** for Railway/Docker health checks.
 
 ---
 
@@ -165,20 +147,35 @@ src/main/java/com/harshita/carmatchmaker/
 └── service/CarService.java
 
 src/main/resources/templates/
-├── index.html      # Budget + priority form
-└── results.html    # Top 3 shortlist cards
+├── index.html
+└── results.html
 
-Dockerfile          # Multi-stage build (Eclipse Temurin 17)
-compose.yaml        # docker compose up
+docs/
+├── home.png
+└── results.png
+
+Dockerfile
+compose.yaml
 ```
+
+---
+
+## Assignment constraints (checklist)
+
+| Requirement | Met by |
+|-------------|--------|
+| Working web app | [Live on Railway](https://car-matchmaker-production.up.railway.app/) + Docker locally |
+| Run in under 2 min | `docker compose up --build` |
+| Full-stack | Thymeleaf UI + Spring recommendation service |
+| Screen recording | [https://youtu.be/4mn6sJqibM4](https://youtu.be/4mn6sJqibM4) |
+| README (4 questions) | Sections above |
 
 ---
 
 ## Submission checklist
 
-Before sending to CarDekho Group, confirm:
-
-- [ ] **Screen recording** link (most important deliverable)
-- [ ] **GitHub repo** link (public or invite)
-- [ ] **Live URL** *or* clear run instructions (this README + Docker)
-- [ ] README answers all four questions (sections above)
+- [x] [Screen recording](https://youtu.be/4mn6sJqibM4)
+- [x] GitHub repo
+- [x] Live URL
+- [x] README (four questions answered)
+- [x] Screenshots in `docs/` 
