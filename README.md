@@ -4,13 +4,13 @@
 
 A full-stack web app that helps car buyers narrow a large catalog down to a **top 3 shortlist** — by entering a budget and whether safety or fuel efficiency matters more.
 
-**Live app:** [https://car-matchmaker-production.up.railway.app/](https://car-matchmaker-production.up.railway.app/)
+**Live app:** [https://car-matchmaker.onrender.com/](https://car-matchmaker.onrender.com/)
 
 **Repository:** [https://github.com/Harshita9v9/car-matchmaker](https://github.com/Harshita9v9/car-matchmaker)
 
 | Deliverable | Link |
 |-------------|------|
-| Live URL | [car-matchmaker-production.up.railway.app](https://car-matchmaker-production.up.railway.app/) |
+| Live URL | [car-matchmaker.onrender.com](https://car-matchmaker.onrender.com/) |
 | GitHub repo | [Harshita9v9/car-matchmaker](https://github.com/Harshita9v9/car-matchmaker) |
 | Run locally | `docker compose up --build` (see below) |
 | Screen recording | [https://youtu.be/4mn6sJqibM4](https://youtu.be/4mn6sJqibM4) |
@@ -40,8 +40,8 @@ docker compose up --build
 Open **http://localhost:8080**
 
 ```bash
-docker compose up --build -d   # background
-docker compose down            # stop
+docker compose up --build -d   # background
+docker compose down            # stop
 ```
 
 ---
@@ -66,14 +66,14 @@ mvnw spring-boot:run
 
 ```
 Browser
-   │
-Thymeleaf UI  (index.html, results.html)
-   │
-Spring MVC Controller  (CarController)
-   │
-Recommendation Service  (CarService — filter, sort, top 3)
-   │
-In-Memory Dataset  (15 cars loaded at startup)
+   │
+Thymeleaf UI  (index.html, results.html)
+   │
+Spring MVC Controller  (CarController)
+   │
+Recommendation Service  (CarService — filter, sort, top 3)
+   │
+In-Memory Dataset  (15 cars loaded at startup)
 ```
 
 **Request flow:** User submits budget + priority → controller calls `getRecommendations()` → service filters by price, sorts by safety or mileage, returns three cars → Thymeleaf renders result cards.
@@ -112,15 +112,15 @@ I focused on a small feature set that works end-to-end rather than a larger app 
 | Framework | Spring Boot 3 (Web + Thymeleaf) |
 | UI | Thymeleaf + Tailwind CSS (CDN) |
 | Build | Maven (`mvnw`) |
-| Deploy | Docker + [Railway](https://railway.app) |
+| Deploy | Docker + [Render](https://render.com) |
 
-**Why:** Java and Spring Boot are a good fit for server-side filtering and sorting with clear structure (controller / service / model). **Thymeleaf** keeps the UI in the same project as the backend — no separate frontend app or REST layer for a simple form → results page. **Tailwind via CDN** adds layout and styling without a Node build step. **Docker Compose** gives reviewers a one-command local run; **Railway** hosts the live demo from the same `Dockerfile`.
+**Why:** Java and Spring Boot are a good fit for server-side filtering and sorting with clear structure (controller / service / model). **Thymeleaf** keeps the UI in the same project as the backend — no separate frontend app or REST layer for a simple form → results page. **Tailwind via CDN** adds layout and styling without a Node build step. **Docker Compose** gives reviewers a one-command local run; **Render** hosts the live demo from the same `Dockerfile`.
 
 ### 3. What did you delegate to AI tools vs. do manually? Where did they help most / get in the way?
 
 I used **Cursor** to generate the initial Spring Boot project structure (`Car`, `CarService`, `CarController`), Thymeleaf templates with Tailwind styling, Docker/`compose.yaml` setup, and a first draft of this README.
 
-I **manually** reviewed the generated code, adjusted the recommendation logic, verified sorting behavior (safety vs. mileage), fixed environment issues (Java path, Git credentials, Railway `PORT` binding), deployed to Railway, and tested the application end-to-end in the browser.
+I **manually** reviewed the generated code, adjusted the recommendation logic, verified sorting behavior (safety vs. mileage), fixed environment issues (Java path, Git credentials, Render `PORT` binding), deployed to Render, and tested the application end-to-end in the browser.
 
 **Where AI helped most:** Speed on boilerplate — MVC wiring, HTML templates, multi-stage Dockerfile, and README structure — so more time stayed on behavior and deployment.
 
@@ -133,7 +133,7 @@ The screen recording shows prompting, reviewing output, and correcting issues ra
 1. **LLM integration** — short, personalized “why this car fits you” text from budget + priority, not only static reviews.
 2. **Cloud database** — PostgreSQL (or similar) for real inventory and updates without redeploying.
 3. **Integration tests** for `getRecommendations` (budget filter, sort order, limit of 3).
-4. **Health endpoint** for Railway/Docker health checks.
+4. **Health endpoint** for Render/Docker health checks.
 
 ---
 
@@ -164,7 +164,7 @@ compose.yaml
 
 | Requirement | Met by |
 |-------------|--------|
-| Working web app | [Live on Railway](https://car-matchmaker-production.up.railway.app/) + Docker locally |
+| Working web app | [Live on Render](https://car-matchmaker.onrender.com/) + Docker locally |
 | Run in under 2 min | `docker compose up --build` |
 | Full-stack | Thymeleaf UI + Spring recommendation service |
 | Screen recording | [https://youtu.be/4mn6sJqibM4](https://youtu.be/4mn6sJqibM4) |
@@ -178,4 +178,4 @@ compose.yaml
 - [x] GitHub repo
 - [x] Live URL
 - [x] README (four questions answered)
-- [x] Screenshots in `docs/` 
+- [x] Screenshots in `docs/`
